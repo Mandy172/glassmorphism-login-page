@@ -5,6 +5,7 @@ import { Sparkles } from "lucide-react"
 
 import { LoginForm } from "@/components/auth/login-form"
 import { SignupForm } from "@/components/auth/signup-form"
+import { useGlassTilt } from "@/components/auth/use-glass-tilt"
 import { OrDivider, SocialButtons } from "@/components/auth/social-buttons"
 import { cn } from "@/lib/utils"
 
@@ -23,6 +24,7 @@ const copy: Record<Mode, { title: string; subtitle: string }> = {
 export function AuthCard() {
   const [mode, setMode] = useState<Mode>("login")
   const tabRefs = useRef<Record<Mode, HTMLButtonElement | null>>({ login: null, signup: null })
+  const tilt = useGlassTilt<HTMLElement>()
 
   function handleTabKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return
@@ -34,12 +36,25 @@ export function AuthCard() {
 
   return (
     <section
+      ref={tilt.ref}
+      onPointerMove={tilt.onPointerMove}
+      onPointerLeave={tilt.onPointerLeave}
       aria-labelledby="auth-title"
-      className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/30 bg-white/10 p-6 shadow-[0_24px_80px_-12px_rgba(20,10,60,0.55),inset_0_1px_0_0_rgba(255,255,255,0.45)] backdrop-blur-xl sm:p-9"
+      style={{ transform: "perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))" }}
+      className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/30 bg-white/10 p-6 shadow-[0_24px_80px_-12px_rgba(20,10,60,0.55),inset_0_1px_0_0_rgba(255,255,255,0.45)] backdrop-blur-xl transition-transform duration-500 ease-out will-change-transform data-[tilting=true]:duration-150 motion-reduce:transform-none! sm:p-9"
     >
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent"
+      />
+      <span
+        aria-hidden="true"
+        style={{
+          background:
+            "radial-gradient(420px circle at var(--glare-x, 50%) var(--glare-y, 50%), rgba(255,255,255,0.28), rgba(255,255,255,0.06) 40%, transparent 70%)",
+          opacity: "var(--glare-opacity, 0)",
+        }}
+        className="pointer-events-none absolute inset-0 z-20 rounded-[inherit] mix-blend-overlay transition-opacity duration-500"
       />
 
       <header className="mb-7 flex flex-col items-center text-center">
